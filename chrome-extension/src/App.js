@@ -510,7 +510,7 @@ class App extends Component {
 
         <hr />
 
-        <Row>
+        {/* <Row>
           <Col>
             <details>
               <summary>[Mail]</summary>
@@ -654,9 +654,11 @@ class App extends Component {
           positionDetail={positionDetail}
           nextMail={this.nextMail}
           priorMail={this.priorMail}
-        />
+        /> */}
 
         <hr />
+
+        <p>Testing!</p>
 
         <Memo
           user={user}

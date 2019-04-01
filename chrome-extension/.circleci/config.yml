@@ -4,11 +4,11 @@ jobs:
     docker:
       - image: circleci/node:8
 
-    working_directory: ~/recruit-manager/chrome-extension
+    working_directory: ~/recruit-manager-extension/chrome-extension
 
     steps:
       - checkout:
-          path: ~/recruit-manager
+          path: ~/recruit-manager/extension
 
       - restore_cache:
           keys:
