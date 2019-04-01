@@ -1,0 +1,30 @@
+{
+  "manifest_version": 2,
+
+  "name": "Recruit Manager",
+  "description": "리크루트 매니저는 온라인 다수의 이력서를 검토하는 리크루터들을 위해서 만들어진 Assistant Tool 입니다.",
+  "version": "0.0.1",
+
+  "browser_action": {
+    "default_popup": "index.html",
+    "default_title": "Open the popup"
+  },
+  "icons": {
+    "16": "logo.png",
+    "48": "logo.png",
+    "128": "logo.png"
+  },
+  "content_security_policy": "script-src 'self' 'sha256-GgRxrVOKNdB4LrRsVPDSbzvfdV4UqglmviH9GoBJ5jk='; object-src 'self'",
+  "permissions": [
+    "tabs",
+    "activeTab",
+    "background",
+    "identity",
+    "identity.email",
+    "storage"
+  ],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  }
+}
