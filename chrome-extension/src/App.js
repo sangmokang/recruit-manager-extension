@@ -11,6 +11,7 @@ import {
 } from 'react-bootstrap';
 import Axios from 'axios';
 import Api from './utils/api';
+import Mail from './components/mail/Mail';
 import Sms from './components/sms/Sms';
 import Memo from './components/memo/Memo';
 import Footer from './components/footer/Footer';
@@ -413,6 +414,7 @@ class App extends Component {
       ratings,
       positionDetail,
       selectedPosition,
+      fetchingCrawlingData,
       mail,
       sms,
       validatedMail,
@@ -425,7 +427,7 @@ class App extends Component {
       <Container style={{ fontSize: '0.75em' }}>
         <Row>
           <Col className="pullRight">
-            {this.state.fetchingCrawlingData ? (
+            {fetchingCrawlingData ? (
               <Dropdown as={ButtonGroup} style={{ float: 'right' }} size="sm">
                 <Button variant="outline-danger" disabled>
                   저장
@@ -644,6 +646,15 @@ class App extends Component {
             </details>
           </Col>
         </Row>
+
+        <Mail
+          user={user}
+          candidate={candidate}
+          selectedPosition={selectedPosition}
+          positionDetail={positionDetail}
+          nextMail={this.nextMail}
+          priorMail={this.priorMail}
+        />
 
         <hr />
 
