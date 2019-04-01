@@ -1,20 +1,10 @@
 import React, { Component } from 'react';
 import { Button, Col, Form, Row } from 'react-bootstrap';
-import Axios from 'axios';
-import Api from '../../utils/api';
 
 export default class Mail extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      mail: {
-        title: '',
-        content:
-          '안녕하세요, \n간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다.',
-        sign: `\n커리어셀파 헤드헌터 강상모 \n+82 010 3929 7682 \nwww.careersherpa.co.kr`
-      },
-      mailKey: 0,
-      mailList: [],
       validatedMail: false
     };
   }
@@ -32,9 +22,10 @@ export default class Mail extends Component {
   };
 
   render() {
-    const { mail, validatedMail } = this.state;
+    const { validatedMail } = this.state;
     const {
       candidate,
+      mail,
       nextMail,
       priorMail,
       positionDetail,
