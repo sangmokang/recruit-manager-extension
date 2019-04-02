@@ -30,10 +30,11 @@ export default class Sms extends Component {
   };
 
   sendSMS = () => {
+    const number = this.props.candidate.mobile.replace(/-/g, '');
     Axios.post(Api.sendSMS, {
       user_id: this.props.user.user_id,
       rm_code: this.props.candidate.rm_code,
-      recipient: this.props.candidate.mobile,
+      recipient: number,
       body: this.props.sms.content,
       position: this.props.selectedPosition
     });
@@ -46,7 +47,11 @@ export default class Sms extends Component {
       candidate,
       sms,
       handleMobileChange,
-      handleContentChange
+      handleContentChange,
+      nextSms,
+      priorSms,
+      date,
+      smsKey
     } = this.props;
 
     return (
@@ -72,7 +77,7 @@ export default class Sms extends Component {
                   <Form.Control
                     required
                     size="sm"
-                    value={candidate.mobile || null}
+                    value={candidate.mobile || 'N/A'}
                     onChange={event => handleMobileChange(event)}
                   />
                   <Form.Control.Feedback type="invalid">
@@ -91,7 +96,7 @@ export default class Sms extends Component {
                     size="sm"
                     rows="2"
                     required
-                    value={sms.content || null}
+                    value={sms.content || '내용 없음'}
                     onChange={event => handleContentChange(event)}
                   />
                   <Form.Control.Feedback type="invalid">
@@ -101,12 +106,28 @@ export default class Sms extends Component {
               </Form.Group>
 
               <Form.Group as={Row}>
-                <Col sm={9} />
-                <Button column sm={2} size="sm" variant="outline-warning">
+                <Col sm={2} />
+                <Col>
+                  <Form.Label>
+                    {smsKey ? `No.${smsKey} / ${date}` : ''}
+                  </Form.Label>
+                </Col>
+                <Button
+                  column
+                  sm={2}
+                  size="sm"
+                  variant="outline-warning"
+                  onClick={priorSms}
+                >
                   <i className="fas fa-arrow-left" />
                 </Button>
                 <Col sm={2}>
-                  <Button column sm={2} size="sm" variant="outline-warning">
+                  <Button
+                    column
+                    size="sm"
+                    variant="outline-warning"
+                    onClick={nextSms}
+                  >
                     <i className="fas fa-arrow-right" />
                   </Button>
                 </Col>

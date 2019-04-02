@@ -28,6 +28,10 @@ export default class Mail extends Component {
       mail,
       nextMail,
       priorMail,
+      mailKey,
+      date,
+      handleContentChange,
+      handleDetailChange,
       positionDetail,
       selectedPosition
     } = this.props;
@@ -102,15 +106,8 @@ export default class Mail extends Component {
                       size="sm"
                       rows="2"
                       required
-                      value={mail.content || null}
-                      onChange={event =>
-                        this.setState({
-                          mail: {
-                            ...mail,
-                            content: event.target.value
-                          }
-                        })
-                      }
+                      value={mail.content || '내용 없음'}
+                      onChange={event => handleContentChange(event)}
                     />
                     <Form.Control.Feedback type="invalid">
                       메일을 작성해주세요.
@@ -118,7 +115,12 @@ export default class Mail extends Component {
                   </Col>
                 </Form.Group>
                 <Form.Group as={Row}>
-                  <Col sm={9} />
+                  <Col sm={2} />
+                  <Col>
+                    <Form.Label>
+                      {mailKey ? `No.${mailKey} / ${date}` : ''}
+                    </Form.Label>
+                  </Col>
                   <Button
                     onClick={priorMail}
                     column
@@ -152,11 +154,7 @@ export default class Mail extends Component {
                       rows="3"
                       required
                       value={positionDetail || '디테일 없음'}
-                      onChange={event =>
-                        this.setState({
-                          positionDetail: event.target.value
-                        })
-                      }
+                      onChange={event => handleDetailChange(event)}
                     />
                     <Form.Control.Feedback type="invalid">
                       포지션 디테일을 작성해주세요.
