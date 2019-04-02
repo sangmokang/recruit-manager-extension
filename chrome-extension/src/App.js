@@ -51,8 +51,10 @@ class App extends Component {
       records: [],
       mailList: [],
       mailKey: 0,
+      mailSentDate: null,
       smsList: [],
-      smsKey: 0
+      smsKey: 0,
+      smsSentDate: null
     };
   }
 
@@ -156,22 +158,13 @@ class App extends Component {
     const { user_id } = this.state.user;
     const { rm_code, email } = this.state.candidate;
     try {
-      const mails = await Axios.post(Api.getMail, { user_id, rm_code, email });
+      const mails = await Axios.post(Api.getMail, {
+        user_id,
+        rm_code,
+        recipient: email
+      });
       this.setState(prevState => ({
         mailList: [...prevState.mailList, mails.data.result]
-      }));
-    } catch (err) {
-      alert(err);
-    }
-  };
-
-  fetchSMS = async () => {
-    const { user_id } = this.state.user;
-    const { rm_code, mobile } = this.state.candidate;
-    try {
-      const sms = await Axios.post(Api.getSMS, { user_id, rm_code, mobile });
-      this.setState(prevState => ({
-        smsList: [...prevState.mailList, sms.data.result]
       }));
     } catch (err) {
       alert(err);
@@ -182,29 +175,31 @@ class App extends Component {
     try {
       const { mailKey, mailList } = this.state;
       if (mailKey === 0 && mailList[0][0]) {
-        const { body, client, position } = mailList[0][0];
-        this.setState(prevState => ({
-          selectedPosition: position,
-          mail: {
-            title: `${client} | ${position}`,
-            content: body,
-            sign: `\n커리어셀파 헤드헌터 강상모 \n+82 010 3929 7682 \nwww.careersherpa.co.kr`
-          },
-          mailKey: prevState.mailKey + 1
-        }));
-        alert('메일을 불러왔습니다');
-      } else if (mailKey > 0 && mailList[0][mailKey]) {
-        const { body, client, position } = mailList[0][mailKey];
-        this.setState(prevState => ({
-          selectedPosition: position,
-          mail: {
-            title: `${client} | ${position}`,
-            content: body,
-            sign: `\n커리어셀파 헤드헌터 강상모 \n+82 010 3929 7682 \nwww.careersherpa.co.kr`
-          },
-          mailKey: prevState.mailKey + 1
-        }));
+        const { body, client, position, modified_date } = mailList[0][0];
         alert('이메일을 불러왔습니다');
+        this.setState(prevState => ({
+          selectedPosition: position,
+          mail: {
+            title: `${client} | ${position}`,
+            content: body,
+            sign: `\n커리어셀파 헤드헌터 강상모 \n+82 010 3929 7682 \nwww.careersherpa.co.kr`
+          },
+          mailKey: prevState.mailKey + 1,
+          mailSentDate: modified_date
+        }));
+      } else if (mailKey > 0 && mailList[0][mailKey]) {
+        const { body, client, position, modified_date } = mailList[0][mailKey];
+        alert('이메일을 불러왔습니다');
+        this.setState(prevState => ({
+          selectedPosition: position,
+          mail: {
+            title: `${client} | ${position}`,
+            content: body,
+            sign: `\n커리어셀파 헤드헌터 강상모 \n+82 010 3929 7682 \nwww.careersherpa.co.kr`
+          },
+          mailKey: prevState.mailKey + 1,
+          mailSentDate: modified_date
+        }));
       } else {
         alert('더 이상 메일이 없습니다');
       }
@@ -216,20 +211,20 @@ class App extends Component {
   priorMail = async () => {
     try {
       const { mailKey, mailList } = this.state;
-      if (mailKey === 0 && mailList[0][0]) {
-        const { body, client, position } = mailList[0][0];
+      if (mailKey === 0) {
+        alert('더 이상 메일이 없습니다');
         this.setState(prevState => ({
-          selectedPosition: position,
+          selectedPosition: null,
           mail: {
-            title: `${client} | ${position}`,
-            content: body,
+            title: 'N/A',
+            content: 'N/A',
             sign: `\n커리어셀파 헤드헌터 강상모 \n+82 010 3929 7682 \nwww.careersherpa.co.kr`
-          }
+          },
+          mailSentDate: ''
         }));
-        alert('메일을 불러왔습니다');
-      }
-      if (mailKey > 0 && mailList[0][mailKey - 1]) {
-        const { body, client, position } = mailList[0][mailKey - 1];
+      } else if (mailKey > 0 && mailList[0][mailKey]) {
+        const { body, client, position, modified_date } = mailList[0][mailKey];
+        alert('이메일을 불러왔습니다');
         this.setState(prevState => ({
           selectedPosition: position,
           mail: {
@@ -237,15 +232,28 @@ class App extends Component {
             content: body,
             sign: `\n커리어셀파 헤드헌터 강상모 \n+82 010 3929 7682 \nwww.careersherpa.co.kr`
           },
-          mailKey: prevState.mailKey - 1
+          mailKey: prevState.mailKey - 1,
+          mailSentDate: modified_date
         }));
-        alert('이메일을 불러왔습니다');
-      } else {
-        alert('더 이상 메일이 없습니다');
       }
     } catch (err) {
       alert(err);
     }
+  };
+
+  userUpdateMailContent = event => {
+    this.setState({
+      mail: {
+        ...this.mail,
+        content: event.target.value
+      }
+    });
+  };
+
+  userUpdateMailDetail = event => {
+    this.setState({
+      positionDetail: event.target.value
+    });
   };
 
   mailSubmit = event => {
@@ -277,6 +285,86 @@ class App extends Component {
       position: this.state.selectedPosition
     });
     this.addCount('mailCount');
+  };
+
+  fetchSMS = async () => {
+    const { user_id } = this.state.user;
+    const { rm_code, mobile } = this.state.candidate;
+    try {
+      const sms = await Axios.post(Api.getSMS, {
+        user_id,
+        rm_code,
+        recipient: mobile
+      });
+
+      this.setState(prevState => ({
+        smsList: [...prevState.mailList, sms.data.result]
+      }));
+    } catch (err) {
+      alert(err);
+    }
+  };
+
+  nextSms = async () => {
+    try {
+      const { smsKey, smsList } = this.state;
+      if (smsKey === 0 && smsList[0][0]) {
+        const { body, modified_date } = smsList[0][0];
+        alert('문자를 불러왔습니다');
+        this.setState(prevState => ({
+          sms: {
+            content: body,
+            sign: `\n커리어셀파 강상모 드림. 010-3929-7682`
+          },
+          smsKey: prevState.smsKey + 1,
+          smsSentDate: modified_date
+        }));
+      } else if (smsKey > 0 && smsList[0][smsKey]) {
+        const { body, modified_date } = smsList[0][smsKey];
+        alert('문자를 불러왔습니다');
+        this.setState(prevState => ({
+          sms: {
+            content: body,
+            sign: `\n커리어셀파 강상모 드림. 010-3929-7682`
+          },
+          smsKey: prevState.smsKey + 1,
+          smsSentDate: modified_date
+        }));
+      } else {
+        alert('더 이상 문자가 없습니다');
+      }
+    } catch (err) {
+      alert(err);
+    }
+  };
+
+  priorSms = async () => {
+    try {
+      const { smsKey, smsList } = this.state;
+      if (smsKey === 0) {
+        alert('더 이상 문자가 없습니다');
+        this.setState(prevState => ({
+          sms: {
+            content: `안녕하세요, undefined으로 제안드리오니 메일 검토를 부탁드리겠습니다. 감사합니다.`,
+            sign: '\n커리어셀파 강상모 드림. 010-3929-7682'
+          },
+          smsSentDate: ''
+        }));
+      } else if (smsKey > 0 && smsList[0][smsKey]) {
+        const { body, modified_date } = smsList[0][smsKey];
+        alert('문자를 불러왔습니다');
+        this.setState(prevState => ({
+          sms: {
+            content: body,
+            sign: `\n커리어셀파 강상모 드림. 010-3929-7682`
+          },
+          smsKey: prevState.smsKey - 1,
+          smsSentDate: modified_date
+        }));
+      }
+    } catch (err) {
+      alert(err);
+    }
   };
 
   userUpdateSmsMobile = event => {
@@ -357,6 +445,9 @@ class App extends Component {
       });
       this.fetchMail();
       this.fetchSMS();
+      if (this.state.history.result.length > 0) {
+        alert('저장된 연락처를 불러왔습니다');
+      }
     });
   };
 
@@ -385,6 +476,7 @@ class App extends Component {
           return b.score - a.score;
         });
         this.fetchMail();
+        this.fetchSMS();
         this.setState({
           user: response.user,
           history: response.history,
@@ -394,6 +486,7 @@ class App extends Component {
           fetchingCrawlingData: false,
           resumeCount: response.resumeCount
         });
+        alert('저장했습니다');
       } else {
         alert('Unauthorized user');
         this.setState({ fetchingCrawlingData: false });
@@ -416,7 +509,11 @@ class App extends Component {
       selectedPosition,
       fetchingCrawlingData,
       mail,
+      mailSentDate,
+      mailKey,
       sms,
+      smsSentDate,
+      smsKey,
       user,
       history,
       positions
@@ -502,6 +599,10 @@ class App extends Component {
           candidate={candidate}
           selectedPosition={selectedPosition}
           sms={sms}
+          nextSms={this.nextSms}
+          priorSms={this.priorSms}
+          date={smsSentDate}
+          smsKey={smsKey}
           handleMobileChange={this.userUpdateSmsMobile}
           handleContentChange={this.userUpdateSmsContent}
           addCount={this.addCount}
@@ -517,6 +618,10 @@ class App extends Component {
           mail={mail}
           nextMail={this.nextMail}
           priorMail={this.priorMail}
+          date={mailSentDate}
+          mailKey={mailKey}
+          handleContentChange={this.userUpdateMailContent}
+          handleDetailChange={this.userUpdateMailDetail}
         />
 
         <hr />
