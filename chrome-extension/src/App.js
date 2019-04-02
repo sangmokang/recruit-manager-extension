@@ -9,6 +9,7 @@ import {
   Form,
   Row
 } from 'react-bootstrap';
+import Hotkeys from 'react-hot-keys';
 import Axios from 'axios';
 import Api from './utils/api';
 import Mail from './components/mail/Mail';
@@ -104,6 +105,10 @@ class App extends Component {
       }
     }
     this.updateSmsContent();
+  };
+
+  setPosition = selectedPosition => {
+    this.setState({ selectedPosition }, () => this.fetchPositionDetail());
   };
 
   memoSubmit = event => {
@@ -452,6 +457,7 @@ class App extends Component {
   };
 
   reset = () => {
+    alert('데이터를 초기화 하였습니다');
     var port = chrome.extension.connect({
       name: 'Resetting Communication'
     });
@@ -494,8 +500,11 @@ class App extends Component {
     });
   };
 
-  setPosition = selectedPosition => {
-    this.setState({ selectedPosition }, () => this.fetchPositionDetail());
+  onKeyUp = keyNm => {
+    alert('저장 중입니다...');
+    if (keyNm === 'control+2') {
+      this.crawling();
+    }
   };
 
   render() {
@@ -521,6 +530,7 @@ class App extends Component {
 
     return (
       <Container style={{ fontSize: '0.75em' }}>
+        <Hotkeys keyName="control+2" onKeyUp={this.onKeyUp} />
         <Row>
           <Col className="pullRight">
             {fetchingCrawlingData ? (
