@@ -3,6 +3,8 @@ import { Col, Row, Table } from 'react-bootstrap';
 
 export default class RatingsTable extends Component {
   render() {
+    const { ratings } = this.props;
+
     return (
       <Row>
         <Col>
@@ -18,8 +20,8 @@ export default class RatingsTable extends Component {
                     <th>Score</th>
                   </tr>
                 </thead>
-                {this.props.ratings
-                  ? this.props.ratings.slice(6).map(rate => {
+                {ratings
+                  ? ratings.slice(0, 5).map(rate => {
                       return (
                         <tbody>
                           <tr>
