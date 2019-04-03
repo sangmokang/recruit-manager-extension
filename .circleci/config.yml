@@ -8,7 +8,7 @@ jobs:
 
     steps:
       - checkout:
-          path: ~/recruit-manager/extension
+          path: ~/recruit-manager-extension
 
       - restore_cache:
           keys:
