@@ -80,31 +80,30 @@ function validateEmail(email) {
     .catch(error => console.log(error));
 }
 
-const getURL = () => {
+const loadCandidate = () => {
+  console.log('Loading candidate');
   return new Promise((resolve, reject) => {
-    chrome.tabs.query({ active: true, currentWindow: true }, ([currentTab]) => {
-      const url = decodeURI(currentTab.url);
-      resolve(chrome.storage.local.set({ url }));
+    chrome.storage.local.get(['records', 'history'], response => {
+      for (let i = 0; i < response.records.length; i++) {
+        let record = response.records[i];
+        if (response.history.result === false) {
+          console.log('New resume');
+        } else {
+          console.log('Stored resume');
+          resolve(chrome.storage.local.set({ saved: record.candidate }));
+          break;
+        }
+      }
     });
   });
 };
 
-const loadCandidate = () => {
-  console.log('loading candidate');
+const getURL = () => {
   return new Promise((resolve, reject) => {
-    chrome.storage.local.get(['records', 'url'], response => {
-      const candidateUrl = response.url.substring(28);
-      console.log('candidateUrl', candidateUrl);
-      for (let i = 0; i < response.records.length; i++) {
-        let record = response.records[i];
-        let candidateId = record.candidate.rm_code.substring(13);
-        if (candidateUrl.includes(candidateId)) {
-          resolve(chrome.storage.local.set({ saved: record.candidate }));
-          break;
-        } else {
-          console.log('no it does not include');
-        }
-      }
+    chrome.tabs.query({ active: true, currentWindow: true }, ([currentTab]) => {
+      const url = decodeURI(currentTab.url);
+      console.log('Got url: ', url);
+      resolve(chrome.storage.local.set({ url }));
     });
   });
 };
@@ -149,7 +148,6 @@ const getHistory = async () => {
     })
   });
   const json = await data.json();
-  console.log(json);
   await chrome.storage.local.set({ history: json });
 };
 
@@ -221,7 +219,7 @@ const cacheMessage = myPort => {
   return new Promise((resolve, reject) => {
     resolve(
       chrome.storage.local.get(['saved', 'history'], response => {
-        console.log(response);
+        console.log('cache: ', response);
         myPort.postMessage(response);
       })
     ).catch(error => console.log(error));
