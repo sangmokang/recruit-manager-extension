@@ -296,10 +296,11 @@ class App extends Component {
     const { user_id } = this.state.user;
     const { rm_code, mobile } = this.state.candidate;
     try {
+      const number = mobile.replace(/-/g, '');
       const sms = await Axios.post(Api.getSMS, {
         user_id,
         rm_code,
-        recipient: mobile
+        recipient: number
       });
 
       this.setState(prevState => ({
@@ -373,10 +374,11 @@ class App extends Component {
   };
 
   userUpdateSmsMobile = event => {
+    const number = event.target.value.replace(/-/g, '');
     this.setState({
       candidate: {
         ...this.candidate,
-        mobile: event.target.value
+        mobile: number
       }
     });
   };
