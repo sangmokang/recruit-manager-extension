@@ -80,24 +80,6 @@ function validateEmail(email) {
     .catch(error => console.log(error));
 }
 
-const loadCandidate = () => {
-  console.log('Loading candidate');
-  return new Promise((resolve, reject) => {
-    chrome.storage.local.get(['records', 'history'], response => {
-      for (let i = 0; i < response.records.length; i++) {
-        let record = response.records[i];
-        if (response.history.result === false) {
-          console.log('New resume');
-        } else {
-          console.log('Stored resume');
-          resolve(chrome.storage.local.set({ saved: record.candidate }));
-          break;
-        }
-      }
-    });
-  });
-};
-
 const getURL = () => {
   return new Promise((resolve, reject) => {
     chrome.tabs.query({ active: true, currentWindow: true }, ([currentTab]) => {
@@ -179,13 +161,35 @@ const crawlCandidate = async () => {
   });
 };
 
+const loadCandidate = () => {
+  console.log('Loading candidate...');
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.get(['records', 'url'], response => {
+      for (let i = 0; i < response.records.length; i++) {
+        let record = response.records[i];
+        // console.log('each record: ', record);
+        // console.log("each record's url: ", record.candidate.url);
+        // console.log('current url: ', response.url);
+        if (record.candidate.url !== response.url) {
+          console.log('New resume');
+        } else {
+          console.log('Stored resume');
+          resolve(chrome.storage.local.set({ saved: record.candidate }));
+          break;
+        }
+      }
+    });
+  });
+};
+
 const records = () => {
-  chrome.storage.local.get({ records: [], candidate: {} }, function(result) {
+  chrome.storage.local.get({ records: [], candidate: {}, url: '' }, result => {
     const records = result.records;
     if (result.candidate.code === 200) {
+      result.candidate.result.url = result.url;
       records.push({ candidate: result.candidate.result });
-      chrome.storage.local.set({ records: records }, function() {
-        chrome.storage.local.get('records', function(result) {
+      chrome.storage.local.set({ records: records }, () => {
+        chrome.storage.local.get('records', result => {
           console.log(result.records);
         });
       });
@@ -208,7 +212,7 @@ const compileMessage = myPort => {
           records: response.records,
           saved: response.saved
         };
-        console.log(message);
+        // console.log(message);
         myPort.postMessage(message);
       })
     ).catch(error => console.log(error));
