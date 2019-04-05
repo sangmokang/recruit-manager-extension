@@ -30,11 +30,11 @@ export default class Sms extends Component {
   };
 
   sendSMS = () => {
-    const number = this.props.candidate.mobile.replace(/-/g, '');
+    // const number = this.props.candidate.mobile.replace(/-/g, '');
     Axios.post(Api.sendSMS, {
       user_id: this.props.user.user_id,
       rm_code: this.props.candidate.rm_code,
-      recipient: number,
+      recipient: this.props.candidate.mobile,
       body: this.props.sms.content,
       position: this.props.selectedPosition
     });

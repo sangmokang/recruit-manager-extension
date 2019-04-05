@@ -296,11 +296,11 @@ class App extends Component {
     const { user_id } = this.state.user;
     const { rm_code, mobile } = this.state.candidate;
     try {
-      const number = mobile.replace(/-/g, '');
+      // const number = mobile.replace(/-/g, '');
       const sms = await Axios.post(Api.getSMS, {
         user_id,
         rm_code,
-        recipient: number
+        recipient: mobile
       });
 
       this.setState(prevState => ({
@@ -374,11 +374,11 @@ class App extends Component {
   };
 
   userUpdateSmsMobile = event => {
-    const number = event.target.value.replace(/-/g, '');
+    // const number = event.target.value.replace(/-/g, '');
     this.setState({
       candidate: {
         ...this.candidate,
-        mobile: number
+        mobile: event.target.value
       }
     });
   };
@@ -483,17 +483,21 @@ class App extends Component {
         const sortRatings = response.candidate.rate.sort((a, b) => {
           return b.score - a.score;
         });
-        this.fetchMail();
-        this.fetchSMS();
-        this.setState({
-          user: response.user,
-          history: response.history,
-          candidate: response.candidate,
-          ratings: sortRatings,
+        this.setState(
+          {
+            user: response.user,
+            history: response.history,
+            candidate: response.candidate,
+            ratings: sortRatings,
 
-          fetchingCrawlingData: false,
-          resumeCount: response.resumeCount
-        });
+            fetchingCrawlingData: false,
+            resumeCount: response.resumeCount
+          },
+          () => {
+            this.fetchMail();
+            this.fetchSMS();
+          }
+        );
         alert('저장했습니다');
       } else {
         alert('Unauthorized user');
@@ -634,6 +638,7 @@ class App extends Component {
           mailKey={mailKey}
           handleContentChange={this.userUpdateMailContent}
           handleDetailChange={this.userUpdateMailDetail}
+          addCount={this.addCount}
         />
 
         <hr />
