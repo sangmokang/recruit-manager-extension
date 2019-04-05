@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Col, Form, Row } from 'react-bootstrap';
+import Axios from 'axios';
+import Api from '../../utils/api';
 
 export default class Mail extends Component {
   constructor(props) {
@@ -19,6 +21,25 @@ export default class Mail extends Component {
       this.setState({ validatedMail: true, mailKey: 0 });
       this.sendMail();
     }
+  };
+
+  sendMail = () => {
+    Axios.post(Api.sendMail, {
+      user_id: this.props.user.user_id,
+      rm_code: this.props.candidate.rm_code,
+      sender: this.props.user.user_email,
+      recipient: this.props.candidate.email,
+      subject: this.props.mail.title,
+      body:
+        this.props.mail.content +
+        '\n\n' +
+        '[Position Detail]\n\n' +
+        this.props.positionDetail +
+        '\n\n' +
+        this.props.mail.sign,
+      position: this.props.selectedPosition
+    });
+    this.props.addCount('mailCount');
   };
 
   render() {

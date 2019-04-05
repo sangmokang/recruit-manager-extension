@@ -483,17 +483,21 @@ class App extends Component {
         const sortRatings = response.candidate.rate.sort((a, b) => {
           return b.score - a.score;
         });
-        this.fetchMail();
-        this.fetchSMS();
-        this.setState({
-          user: response.user,
-          history: response.history,
-          candidate: response.candidate,
-          ratings: sortRatings,
+        this.setState(
+          {
+            user: response.user,
+            history: response.history,
+            candidate: response.candidate,
+            ratings: sortRatings,
 
-          fetchingCrawlingData: false,
-          resumeCount: response.resumeCount
-        });
+            fetchingCrawlingData: false,
+            resumeCount: response.resumeCount
+          },
+          () => {
+            this.fetchMail();
+            this.fetchSMS();
+          }
+        );
         alert('저장했습니다');
       } else {
         alert('Unauthorized user');
@@ -634,6 +638,7 @@ class App extends Component {
           mailKey={mailKey}
           handleContentChange={this.userUpdateMailContent}
           handleDetailChange={this.userUpdateMailDetail}
+          addCount={this.addCount}
         />
 
         <hr />

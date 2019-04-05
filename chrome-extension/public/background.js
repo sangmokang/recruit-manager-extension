@@ -83,9 +83,14 @@ function validateEmail(email) {
 const getURL = () => {
   return new Promise((resolve, reject) => {
     chrome.tabs.query({ active: true, currentWindow: true }, ([currentTab]) => {
-      const url = decodeURI(currentTab.url);
-      console.log('Got url: ', url);
-      resolve(chrome.storage.local.set({ url }));
+      if (currentTab) {
+        const url = decodeURI(currentTab.url);
+        console.log('Got url: ', url);
+        resolve(chrome.storage.local.set({ url }));
+      } else {
+        console.log('Unable to get current URL');
+        reject('Unable to get current URL');
+      }
     });
   });
 };
