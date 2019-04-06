@@ -172,9 +172,6 @@ const loadCandidate = () => {
     chrome.storage.local.get(['records', 'url'], response => {
       for (let i = 0; i < response.records.length; i++) {
         let record = response.records[i];
-        // console.log('each record: ', record);
-        // console.log("each record's url: ", record.candidate.url);
-        // console.log('current url: ', response.url);
         if (record.candidate.url !== response.url) {
           console.log('New resume');
         } else {

@@ -18,14 +18,9 @@ export default class Sms extends Component {
       alert('전화번호를 입력해주세요');
       event.stopPropagation();
     } else {
-      if (!this.props.sms.content.includes('undefined')) {
-        event.preventDefault();
-        this.setState({ validatedSms: true });
-        this.sendSMS();
-      } else {
-        event.preventDefault();
-        alert('포지션을 선택해주세요');
-      }
+      event.preventDefault();
+      this.setState({ validatedSms: true });
+      this.sendSMS();
     }
   };
 
@@ -77,7 +72,7 @@ export default class Sms extends Component {
                   <Form.Control
                     required
                     size="sm"
-                    value={candidate.mobile || 'N/A'}
+                    value={candidate.mobile}
                     onChange={event => handleMobileChange(event)}
                   />
                   <Form.Control.Feedback type="invalid">
@@ -96,7 +91,7 @@ export default class Sms extends Component {
                     size="sm"
                     rows="2"
                     required
-                    value={sms.content || '내용 없음'}
+                    value={sms.content}
                     onChange={event => handleContentChange(event)}
                   />
                   <Form.Control.Feedback type="invalid">

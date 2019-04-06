@@ -51,6 +51,7 @@ export default class Mail extends Component {
       priorMail,
       mailKey,
       date,
+      handleTitleChange,
       handleContentChange,
       handleDetailChange,
       positionDetail,
@@ -78,14 +79,6 @@ export default class Mail extends Component {
                       size="sm"
                       required
                       defaultValue={candidate.email || null}
-                      onChange={event =>
-                        this.setState({
-                          candidate: {
-                            ...candidate,
-                            email: event.target.value
-                          }
-                        })
-                      }
                     />
                     <Form.Control.Feedback type="invalid">
                       이메일을 입력해주세요.
@@ -103,14 +96,7 @@ export default class Mail extends Component {
                       size="sm"
                       required
                       value={selectedPosition}
-                      onChange={event =>
-                        this.setState({
-                          mail: {
-                            ...mail,
-                            title: event.target.value
-                          }
-                        })
-                      }
+                      onChange={event => handleTitleChange(event)}
                     />
                     <Form.Control.Feedback type="invalid">
                       메일 제목을 작성해주세요.
@@ -127,7 +113,7 @@ export default class Mail extends Component {
                       size="sm"
                       rows="2"
                       required
-                      value={mail.content || '내용 없음'}
+                      value={mail.content}
                       onChange={event => handleContentChange(event)}
                     />
                     <Form.Control.Feedback type="invalid">
@@ -173,13 +159,9 @@ export default class Mail extends Component {
                       as="textarea"
                       size="sm"
                       rows="3"
-                      required
-                      value={positionDetail || '디테일 없음'}
+                      value={positionDetail}
                       onChange={event => handleDetailChange(event)}
                     />
-                    <Form.Control.Feedback type="invalid">
-                      포지션 디테일을 작성해주세요.
-                    </Form.Control.Feedback>
                   </Col>
                 </Form.Group>
                 <Button type="submit" block size="sm">
