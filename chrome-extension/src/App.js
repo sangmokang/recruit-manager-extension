@@ -466,14 +466,24 @@ class App extends Component {
     return;
   };
 
-  crawling = () => {
-    this.setState({ fetchingCrawlingData: true });
-    var port = chrome.extension.connect({
-      name: 'Crawling Communication'
-    });
-    port.postMessage('Requesting crawling');
+  crawlOrUpdate = command => {
+    let port = null;
+    if (command === 'crawl') {
+      this.setState({ fetchingCrawlingData: true });
+      port = chrome.extension.connect({
+        name: 'Crawling Communication'
+      });
+      port.postMessage('Requesting crawling');
+    } else if (command === 'update') {
+      port = chrome.extension.connect({
+        name: 'Resume Update Communication'
+      });
+      port.postMessage('Requesting resume update');
+    }
     port.onMessage.addListener(response => {
-      if (response.user && response.user.check === true) {
+      if (response.warning) {
+        alert('상세 정보 창을 켜주세요');
+      } else if (response.user && response.user.check === true) {
         const sortRatings = response.candidate.rate.sort((a, b) => {
           return b.score - a.score;
         });
@@ -492,10 +502,16 @@ class App extends Component {
             this.fetchSMS();
           }
         );
-        alert('저장했습니다');
+        if (command === 'crawl') {
+          alert('저장했습니다');
+        } else if (command === 'update') {
+          alert('업데이트 했습니다');
+        }
       } else {
         alert('Unauthorized user');
-        this.setState({ fetchingCrawlingData: false });
+        if (command === 'crawl') {
+          this.setState({ fetchingCrawlingData: false });
+        }
       }
     });
   };
@@ -535,6 +551,12 @@ class App extends Component {
           <Col className="pullRight">
             {fetchingCrawlingData ? (
               <Dropdown as={ButtonGroup} style={{ float: 'right' }} size="sm">
+                <Button
+                  variant="outline-danger"
+                  onClick={() => this.crawlOrUpdate('update')}
+                >
+                  업데이트
+                </Button>
                 <Button variant="outline-danger" disabled>
                   저장
                 </Button>
@@ -549,7 +571,16 @@ class App extends Component {
               </Dropdown>
             ) : (
               <Dropdown as={ButtonGroup} style={{ float: 'right' }} size="sm">
-                <Button variant="outline-danger" onClick={this.crawling}>
+                <Button
+                  variant="outline-danger"
+                  onClick={() => this.crawlOrUpdate('update')}
+                >
+                  업데이트
+                </Button>
+                <Button
+                  variant="outline-danger"
+                  onClick={() => this.crawlOrUpdate('crawl')}
+                >
                   저장
                 </Button>
                 <Dropdown.Toggle
