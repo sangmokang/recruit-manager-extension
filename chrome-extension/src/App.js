@@ -161,13 +161,8 @@ class App extends Component {
 
   fetchMail = async () => {
     const { user_id } = this.state.user;
-    const { rm_code, email } = this.state.candidate;
     try {
-      const mails = await Axios.post(Api.getMail, {
-        user_id,
-        rm_code,
-        recipient: email
-      });
+      const mails = await Axios.post(Api.recentMail, { user_id });
       this.setState(prevState => ({
         mailList: [...prevState.mailList, mails.data.result]
       }));
@@ -246,6 +241,12 @@ class App extends Component {
     }
   };
 
+  userUpdateMailTitle = event => {
+    this.setState({
+      selectedPosition: event.target.value
+    });
+  };
+
   userUpdateMailContent = event => {
     this.setState({
       mail: {
@@ -294,15 +295,8 @@ class App extends Component {
 
   fetchSMS = async () => {
     const { user_id } = this.state.user;
-    const { rm_code, mobile } = this.state.candidate;
     try {
-      // const number = mobile.replace(/-/g, '');
-      const sms = await Axios.post(Api.getSMS, {
-        user_id,
-        rm_code,
-        recipient: mobile
-      });
-
+      const sms = await Axios.post(Api.recentSMS, { user_id });
       this.setState(prevState => ({
         smsList: [...prevState.mailList, sms.data.result]
       }));
@@ -636,6 +630,7 @@ class App extends Component {
           priorMail={this.priorMail}
           date={mailSentDate}
           mailKey={mailKey}
+          handleTitleChange={this.userUpdateMailTitle}
           handleContentChange={this.userUpdateMailContent}
           handleDetailChange={this.userUpdateMailDetail}
           addCount={this.addCount}

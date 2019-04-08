@@ -13,7 +13,12 @@ export default class Footer extends Component {
           <Col>
             {history && history.result
               ? history.result.map(each => {
-                  return <p>{each}</p>;
+                  return (
+                    <span>
+                      {each}
+                      <br />
+                    </span>
+                  );
                 })
               : 'new candidate'}
           </Col>
